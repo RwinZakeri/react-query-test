@@ -78,7 +78,7 @@ const AuthGuard = ({ children }: { children: ReactNode }) => {
       } catch (err) {
         toast({
           title: "an error happend",
-          description: "505",
+          description: "500",
         });
       }
     };
