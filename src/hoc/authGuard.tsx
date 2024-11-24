@@ -84,7 +84,7 @@ const AuthGuard = ({ children }: { children: ReactNode }) => {
     };
     fetch();
   };
-
+  console.log("object");
   return !userLoginStatus ? (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
