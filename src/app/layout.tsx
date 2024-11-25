@@ -1,7 +1,7 @@
-import AuthGuard from "@/hoc/authGuard";
 import ReactQuery from "@/providers/react-query/reactQuery";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import AuthGuard from "../hoc/authGuard";
 import "./globals.css";
 
 const geistSans = localFont({

@@ -9,12 +9,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { toast } from "@/hooks/use-toast";
-import { AXIOS } from "@/setting/axiosInterceptor";
-import { loginForm, User } from "@/types/type";
-import { useLocalStorage } from "@uidotdev/usehooks";
-import { ReactNode, useEffect, useState } from "react";
+import Link from "next/link";
+import { ReactNode, useState } from "react";
+import { Input } from "../components/ui/input";
+import { loginForm } from "../types/type";
 
 const AuthGuard = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -23,29 +21,7 @@ const AuthGuard = ({ children }: { children: ReactNode }) => {
     userPassword: "",
   });
 
-  // Use the useLocalStorage hook at the top level of the component
-
-  const [isLoggedInBefore, setIsLoggedInBefore] = useLocalStorage(
-    "isLoggedIn",
-    false
-  );
-  // Check login status and set the state accordingly
   const [userLoginStatus, setUserLoginStatus] = useState(false);
-
-  //   const { data: users, isLoading } = useQuery({
-  //     queryKey: ["test"],
-  //     queryFn: () => {
-  //       return queryFetcher("/users");
-  //     },
-  //   });
-
-  useEffect(() => {
-    console.log(userLoginStatus);
-    if (isLoggedInBefore == true) {
-      setUserLoginStatus(true);
-      setIsOpen(false);
-    }
-  }, []);
 
   const setInputValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value, name } = e.target;
@@ -59,66 +35,113 @@ const AuthGuard = ({ children }: { children: ReactNode }) => {
     if (!formData.userName || !formData.userPassword) {
       return;
     }
-    const fetch = async () => {
-      try {
-        const res = await AXIOS.get("/usasders");
-        const users = res.data;
-        const userIsValid = await users?.find((item: User) => {
-          if (
-            item.userName == formData.userName &&
-            item.password == formData.userPassword
-          ) {
-            return item;
-          }
-        });
-        if (userIsValid) {
-          setIsLoggedInBefore(true);
-          setUserLoginStatus(true);
-        }
-      } catch (err) {
-        toast({
-          title: "an error happend",
-          description: "500",
-        });
-      }
-    };
-    fetch();
+
+    console.log(formData);
   };
   console.log("object");
-  return !userLoginStatus ? (
-    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Are you logged in?</AlertDialogTitle>
-          <AlertDialogDescription>Please login</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <Input
-            name="userName"
-            type="text"
-            value={formData.userName} // Bind value to the state
-            onChange={setInputValue}
-            placeholder="Username:"
-          />
-          <Input
-            name="userPassword"
-            type="password"
-            value={formData.userPassword} // Bind value to the state
-            onChange={setInputValue}
-            placeholder="Password:"
-          />
-          <Button
-            type="button"
-            onClick={submitData} // Trigger submit logic
-          >
-            Login
+
+  switch (2) {
+    case 1:
+      return (
+        <>
+          <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you logged in?</AlertDialogTitle>
+                <AlertDialogDescription>Please login</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <Input
+                  name="userName"
+                  type="text"
+                  value={formData.userName} // Bind value to the state
+                  onChange={setInputValue}
+                  placeholder="Username:"
+                />
+                <Input
+                  name="userPassword"
+                  type="password"
+                  value={formData.userPassword} // Bind value to the state
+                  onChange={setInputValue}
+                  placeholder="Password:"
+                />
+                <Button
+                  type="button"
+                  onClick={submitData} // Trigger submit logic
+                >
+                  Login
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          <Button variant={"ghost"}>
+            <Link href="/">hello</Link>
           </Button>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  ) : (
-    children // Render the children if the user is logged in
-  );
+        </>
+      );
+
+    case 2:
+      return (
+        <>
+          <Tabs defaultValue="account" className="w-[400px]">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="account">Account</TabsTrigger>
+              <TabsTrigger value="password">Password</TabsTrigger>
+            </TabsList>
+            <TabsContent value="account">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Account</CardTitle>
+                  <CardDescription>
+                    Make changes to your account here. Click save when you're
+                    done.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="name">Name</Label>
+                    <Input id="name" defaultValue="Pedro Duarte" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="username">Username</Label>
+                    <Input id="username" defaultValue="@peduarte" />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button>Save changes</Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+            <TabsContent value="password">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Password</CardTitle>
+                  <CardDescription>
+                    Change your password here. After saving, you'll be logged
+                    out.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="space-y-1">
+                    <Label htmlFor="current">Current password</Label>
+                    <Input id="current" type="password" />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="new">New password</Label>
+                    <Input id="new" type="password" />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button>Save password</Button>
+                </CardFooter>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </>
+      );
+    default:
+      return <h1>not found</h1>;
+  }
 };
 
 export default AuthGuard;
